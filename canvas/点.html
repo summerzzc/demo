@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas></canvas>
+</body>
+<script type="text/javascript">
+    var myCanvas = document.getElementsByTagName('canvas')[0];
+    myCanvas.width = '500';
+    myCanvas.height = '500';
+
+    //创建可绘制对象
+    var ctx = myCanvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 500, 500);
+
+
+    //粒子
+    function Particle(ctx, index) {
+        this.ctx = ctx;
+        this.oX = Math.random() * 500;
+        this.oY = Math.random() * 500;
+        this.oR = Math.random() * 10;
+        this.vX = Math.random() * 2 - 1;
+        this.vY = Math.random() * 2 - 1;
+        this.step = Math.random() + 0.5;
+        this.index = index;
+        this.addParticle();
+        let _this = this;
+    }
+    //添加粒子
+    Particle.prototype.addParticle = function () {
+        //空心圆
+        this.ctx.beginPath();//开始
+        this.ctx.arc(this.oX, this.oY, this.oR, 0, Math.PI * 2);
+        this.ctx.closePath();
+        // 创建渐变
+        var gradient = this.ctx.createRadialGradient(this.oX, this.oY, 0, this.oX, this.oY, this.oR);
+        gradient.addColorStop('0', '#fff');
+        gradient.addColorStop('1', 'transparent');
+        this.ctx.fillStyle = gradient;//笔触设置为渐变
+        this.ctx.fill();//结束
+    }
+    //粒子移动
+    Particle.prototype.moveParticle = function () {
+        this.oX = this.oX + this.step * this.vX;
+        this.oY = this.oY + this.step * this.vY;
+        if ((this.oX < 0) && (this.vX < 0)) {
+            this.vX = -this.vX;
+        }
+        if ((this.oX - 500 > 0) && (this.vX > 0)) {
+            this.vX = -this.vX;
+        }
+        if ((this.oY < 0) && (this.vY < 0)) {
+            this.vY = -this.vY;
+        }
+        if ((this.oY - 500 > 0) && (this.vY > 0)) {
+            this.vY = -this.vY;
+        }
+    }
+    let aggregate = [];
+    for (let i = 0; i < 20; i++) {
+        let particle = new Particle(ctx, i);
+        aggregate.push(particle);
+    }
+    setInterval(function () {
+        ctx.clearRect(0, 0, 500, 500);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, 500, 500);
+        for (let i = 0; i < 20; i++) {
+            aggregate[i].moveParticle();
+            aggregate[i].addParticle();
+        }
+    }, 1000 / 30)
+</script>
+
+</html>
